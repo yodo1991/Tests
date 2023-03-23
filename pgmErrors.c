@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
+
+#include "pgmErrors.h"
 #define NUM_ERROR_STRINGS 12
 #define ERROR_UNKNOWN 11
 

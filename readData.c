@@ -4,7 +4,7 @@
 
 #include "pgm.h"
 #include "readData.h"
-#include "pgmError.h"
+#include "pgmErrors.h"
 
 
 

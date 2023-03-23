@@ -3,7 +3,7 @@
 
 #include "pgm.h"
 #include "writeData.h"
-#include "pgmError.h"
+#include "pgmErrors.h"
 
 
 int write_data(PGM *pgm, char *filename){
