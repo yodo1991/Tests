@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 		/* print an error message        */
 		printf("Usage: %s inputImage.pgm outputImage.pgm\n", argv[0]);
 		/* and return an error code      */
-		ExitWithError(Bad_Argument_Count, NULL);// 1 means 'Bad Argument Count'
+		ExitWithError(Bad_Argument_Count, NULL);
 	} /* wrong arg count */
 	
 
@@ -31,5 +31,5 @@ int main(int argc, char **argv) {
 	write_data(pgm, w_filename);
 
 
-	return 0;
+	return EXIT_NO_ERRORS;
 }

@@ -55,7 +55,7 @@ PGM *read_data(PGM *pgm, char *filename) {
 	magic_number[1] = getc(inputFile);
 
 	/* sanity check on the magic number      */
-	if (*magic_Number != MAGIC_NUMBER_ASCII_PGM) {
+	if (*magic_Number != MAGIC_NUMBER_ASCII_PGM && *magic_Number != MAGIC_NUMBER_RAW_PGM) {
 		/* failed magic number check   */
 		/* be tidy: close the file       */
 		fclose(inputFile);
@@ -149,32 +149,62 @@ PGM *read_data(PGM *pgm, char *filename) {
 	} /* malloc failed */
 
 	/* pointer for efficient read code       */
-	for (unsigned char *nextGrayValue = imageData; nextGrayValue < imageData + nImageBytes; nextGrayValue++) {
-		/* per gray value */
-		/* read next value               */
-		int grayValue = -1;
-		int scanCount = fscanf(inputFile, " %u", &grayValue);
+	if (*magic_Number == MAGIC_NUMBER_ASCII_PGM) {
+		for (unsigned char *nextGrayValue = imageData; nextGrayValue < imageData + nImageBytes; nextGrayValue++) {
+			/* per gray value */
+			/* read next value               */
+			int grayValue = -1;
+			int scanCount = fscanf(inputFile, " %u", &grayValue);
 
-		/* sanity check	                 */
-		if ((scanCount != 1) || (grayValue < 0) || (grayValue > 255)) {
-			/* fscanf failed */
-			/* free memory           */
-			free(commentLine);
-			free(imageData);
 
-			/* close file            */
-			fclose(inputFile);
+			/* sanity check	                 */
+			if ((scanCount != 1) || (grayValue < 0) || (grayValue > 255)) {
+				/* fscanf failed */
+				/* free memory           */
+				free(commentLine);
+				free(imageData);
 
-			/* print error message   */
-			printf("Error: Failed to read pgm image from file %s\n", filename);
+				/* close file            */
+				fclose(inputFile);
 
-			/* and return            */
-			ExitWithError(Bad_Max_Gray_Value,filename);
-		} /* fscanf failed */
+				/* print error message   */
+				printf("Error: Failed to read pgm image from file %s\n", filename);
 
-		/* set the pixel value           */
-		*nextGrayValue = (unsigned char) grayValue;
-	} /* per gray value */
+				/* and return            */
+				ExitWithError(Bad_Max_Gray_Value,filename);
+			} /* fscanf failed */
+
+			/* set the pixel value           */
+			*nextGrayValue = (unsigned char) grayValue;
+		} /* per gray value */
+	}
+	
+	if (*magic_Number == MAGIC_NUMBER_RAW_PGM) {
+		int k = fgetc(inputFile);
+		for (unsigned char *nextGrayValue = imageData; nextGrayValue < imageData + nImageBytes; nextGrayValue++) {
+			/* per gray value */
+			/* read next value               */
+			int grayValue = -1;
+			grayValue = fgetc(inputFile);
+			if ((grayValue < 0) || (grayValue > 255)) {
+				/* fscanf failed */
+				/* free memory           */
+				free(commentLine);
+				free(imageData);
+
+				/* close file            */
+				fclose(inputFile);
+
+				/* print error message   */
+				printf("Error: Failed to read pgm image from file %s\n", filename);
+
+				/* and return            */
+				ExitWithError(Bad_Max_Gray_Value,filename);
+			}  /* fscanf failed */
+			/* set the pixel value           */
+			*nextGrayValue = (unsigned char) grayValue;
+		}
+	}
 
 	pgm->width=width;
 	pgm->height=height;

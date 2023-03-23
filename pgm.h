@@ -15,6 +15,7 @@ typedef struct _pgm {
 #define MAX_IMAGE_DIMENSION 65536
 #define MAX_COMMENT_LINE_LENGTH 128
 
+#define EXIT_NO_ERRORS 0 // Success
 #define Bad_Argument_Count 1 //Program given wrong # of arguments 
 #define Bad_File_Name 2 //Program fails to open file 
 #define Bad_Magic_Number 3 //File has an illegal magic number 

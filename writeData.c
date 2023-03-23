@@ -3,11 +3,7 @@
 
 #include "pgm.h"
 #include "writeData.h"
-
-#define EXIT_NO_ERRORS 0
-#define EXIT_WRONG_ARG_COUNT 1
-#define EXIT_BAD_INPUT_FILE 2
-#define EXIT_BAD_OUTPUT_FILE 3
+#include "pgmError.h"
 
 
 int write_data(PGM *pgm, char *filename){
@@ -18,11 +14,13 @@ int write_data(PGM *pgm, char *filename){
 	char *commentLine = NULL;
 	/* pointer to raw image data	         */
 	unsigned char *imageData = NULL;
+	unsigned short *magic_Number =NULL;
 	
 	int width=pgm->width;
 	int height=pgm->height;
 	int maxGray=pgm->maxGray;
 	commentLine=pgm->commentLine;
+	magic_Number=pgm->magic_Number;
 	imageData=pgm->imageData;
 	
 	
@@ -37,14 +35,18 @@ int write_data(PGM *pgm, char *filename){
 		free(imageData);
 
 		/* print an error message        */
-		printf("Error: Failed to write pgm image to file %s\n", filename);	
-
-		/* return an error code          */
-		return EXIT_BAD_OUTPUT_FILE;
+		ExitWithError(Output_Failed, filename);
 	} /* NULL output file */
 
 	/* write magic number, size & gray value */
-	size_t nBytesWritten = fprintf(outputFile, "P2\n%d %d\n%d\n", width, height, maxGray);
+	size_t nBytesWritten;
+	if (*magic_Number == MAGIC_NUMBER_ASCII_PGM){
+		nBytesWritten = fprintf(outputFile, "P2\n%d %d\n%d\n", width, height, maxGray);
+	}
+	else{
+		nBytesWritten = fprintf(outputFile, "P5\n%d %d\n%d\n", width, height, maxGray);
+	}
+	
 
 	/* check that dimensions wrote correctly */
 	if (nBytesWritten < 0)
@@ -54,10 +56,7 @@ int write_data(PGM *pgm, char *filename){
 		free(imageData);
 
 		/* print an error message        */
-		printf("Error: Failed to write pgm image to file %s\n", filename);	
-
-		/* return an error code          */
-		return EXIT_BAD_OUTPUT_FILE;
+		ExitWithError(Output_Failed, filename);
 	} /* dimensional write failed    */
 	
 	/* define the dimension of output             */
@@ -81,10 +80,7 @@ int write_data(PGM *pgm, char *filename){
 			free(imageData);
 
 			/* print error message   */
-			printf("Error: Failed to write pgm image to file %s\n", filename);	
-
-			/* return an error code  */
-			return EXIT_BAD_OUTPUT_FILE;
+			ExitWithError(Output_Failed, filename);
 		} /* data write failed   */
 	} /* per gray value */
 }
